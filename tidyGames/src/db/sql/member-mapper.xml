@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="loginMember">
+		SELECT
+		       MEM_NO,
+		       MEM_ID,
+		       MEM_PWD,
+		       MEM_NICK,
+		       MEM_NAME,
+		       MEM_BIRTH,
+		       MEM_PHONE,
+		       MEM_EMAIL,
+		       MEM_GENDER,
+		       MEM_ADDRESS,
+		       MEM_INDATE,
+		       MEM_AGR,
+		       MEM_PIC,
+		       MEM_STATUS,
+		       MEM_OUTDATE,
+		       ROLE_ID,
+		       MEM_ACCESS,
+		       BLOCK_DATE,
+		       MEM_COOKIE,
+		       MEM_CATEGORY
+		  FROM MEMBER
+		 WHERE MEM_ID = ?
+		   AND MEM_PWD = ?
+		   AND MEM_STATUS = 'Y'
+	</entry>
+	
+	<entry key="cookieUpdateMem">
+		UPDATE MEMBER
+		   SET MEM_COOKIE = ?
+		 WHERE MEM_ID = ?
+		   AND MEM_STATUS = 'Y'
+	</entry>
+	
+	<entry key="loginMemByCookie">
+		SELECT
+		       MEM_NO,
+		       MEM_ID,
+		       MEM_PWD,
+		       MEM_NICK,
+		       MEM_NAME,
+		       MEM_BIRTH,
+		       MEM_PHONE,
+		       MEM_EMAIL,
+		       MEM_GENDER,
+		       MEM_ADDRESS,
+		       MEM_INDATE,
+		       MEM_AGR,
+		       MEM_PIC,
+		       MEM_STATUS,
+		       MEM_OUTDATE,
+		       ROLE_ID,
+		       MEM_ACCESS,
+		       BLOCK_DATE,
+		       MEM_COOKIE,
+		       MEM_CATEGORY
+		  FROM MEMBER
+		 WHERE MEM_COOKIE = ?
+		   AND MEM_STATUS = 'Y'
+	</entry>
+	
+		<entry key="selectMemberList">
+			SELECT *
+			  FROM (
+			        SELECT ROWNUM RNUM, A.*
+			          FROM ( 
+	                        SELECT
+	                               MEM_NO
+	                             , MEM_ID
+	                             , MEM_NAME
+	                             , MEM_NICK
+	                             , MEM_GENDER
+	                             , MEM_EMAIL
+	                             , MEM_PHONE
+	                             , MEM_ADDRESS
+	                             , MEM_INDATE
+	                             , MEM_STATUS
+	                             FROM MEMBER
+	                            WHERE MEM_STATUS = 'Y'
+	                             ) A
+	                   )                
+			  WHERE RNUM BETWEEN ? AND ? 
+		</entry>	
+		<entry key="selectMemberCount">
+			SELECT 
+				   COUNT(*) "COUNT"
+			  FROM MEMBER
+		</entry>
+		<entry key="deleteMember">
+			UPDATE 
+				   MEMBER 
+		       SET MEM_STATUS = 'N'
+		         , MEM_OUTDATE = SYSDATE 
+		     WHERE MEM_NO = ?
+		</entry>
+		
+	<entry key="searchUserId">
+		SELECT
+		       MEM_NO,
+		       MEM_ID
+		  FROM MEMBER
+		 WHERE MEM_NAME = ?
+		   AND MEM_EMAIL = ?
+		   AND MEM_STATUS = 'Y'
+	</entry>
+
+	<entry key="searchUserPwd">
+		SELECT
+		       MEM_NO,
+		       MEM_ID,
+		       MEM_PWD
+		  FROM MEMBER
+		 WHERE MEM_ID = ?
+		   AND MEM_EMAIL = ?
+		   AND MEM_STATUS = 'Y'
+	</entry>
+	
+	<entry key="updatePwd">
+		UPDATE MEMBER
+		   SET MEM_PWD = ?
+		 WHERE MEM_ID = ?
+	</entry>
+	
+	<entry key="idCheck">
+		SELECT COUNT(*) "COUNT"
+		  FROM MEMBER
+		 WHERE MEM_ID = ?
+	</entry>
+	
+	<entry key="nickCheck">
+		SELECT COUNT(*) "COUNT"
+		  FROM MEMBER
+		 WHERE MEM_NICK = ?
+	</entry>
+	
+	<entry key="insertMem">
+		INSERT 
+		  INTO MEMBER
+		     ( 
+		       MEM_NO
+		     , MEM_ID
+		     , MEM_PWD
+		     , MEM_NICK
+		     , MEM_NAME
+		     , MEM_BIRTH
+		     , MEM_PHONE
+		     , MEM_EMAIL
+		     , MEM_GENDER
+		     , MEM_ADDRESS
+		     , MEM_AGR
+		     , MEM_CATEGORY
+		     )
+		VALUES 
+		     (
+		       SEQ_MEM_NO.NEXTVAL
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		     , ?
+		)
+	</entry>
+	
+	<entry key="selectMember">
+         SELECT
+                MEM_NO
+              , MEM_ID
+              , MEM_NAME
+              , MEM_NICK
+  			  , MEM_BIRTH 
+              , NVL(MEM_GENDER, ' ') "mem_gender"
+              , MEM_EMAIL
+              , MEM_PHONE
+              , NVL(MEM_ADDRESS, ' ') "mem_address"
+              , TO_CHAR(MEM_INDATE, 'YYYY-MM-DD') "MEM_INDATE"
+              , MEM_STATUS
+              FROM MEMBER
+             WHERE MEM_NO = ?
+	</entry>
+
+	<entry key="selectMemberAll">
+		SELECT *
+		  FROM 					(
+		        SELECT ROWNUM RNUM, A.*
+		          FROM ( 
+	                       SELECT
+	                              MEM_NO
+	                            , MEM_ID
+	                            , MEM_NAME
+	                            , MEM_NICK
+	                            , MEM_GENDER
+	                            , MEM_EMAIL
+	                            , MEM_PHONE
+	                            , MEM_ADDRESS
+	                            , MEM_INDATE
+	                            , MEM_STATUS
+	                            FROM MEMBER
+	                            ) A
+	                  )                
+		  WHERE RNUM BETWEEN ? AND ? 											
+	</entry>	
+
+	<entry key="updateMemberList">
+		UPDATE 
+		      MEMBER
+		  SET 
+		      MEM_BIRTH = ?
+		    , MEM_ID = ?
+		    , MEM_NAME = ? 
+		    , MEM_NICK = ?
+		    , MEM_GENDER = ?
+		    , MEM_EMAIL = ?
+		    , MEM_PHONE = ?
+		    , MEM_ADDRESS = ?
+		    , MEM_STATUS = ?
+		WHERE MEM_NO = ?
+	</entry>
+
+	<entry key="updateUserCheck">
+	SELECT COUNT(*) "COUNT"
+		  FROM MEMBER
+		 WHERE MEM_ID = ?
+		   AND MEM_PWD = ?
+	</entry>
+	
+	<entry key="nickUpdateCheck">
+		SELECT COUNT(*) "COUNT"
+		  FROM MEMBER
+		 WHERE MEM_NICK = ?
+		   AND MEM_ID != ?
+	</entry>
+	
+	<entry key="updateMember">
+	UPDATE MEMBER
+	   SET MEM_PWD = ?,
+	       MEM_NICK = ?,
+	       MEM_NAME = ?,
+	       MEM_BIRTH = ?,
+	       MEM_PHONE = ?,
+	       MEM_EMAIL = ?,
+	       MEM_GENDER = ?,
+	       MEM_ADDRESS = ?,
+	       MEM_AGR = ?,
+	       MEM_CATEGORY = ?
+	 WHERE MEM_ID = ?
+	</entry>
+	<entry key="deleteMember">
+		UPDATE MEMBER
+		   SET MEM_STATUS = 'N'
+		 WHERE MEM_ID = ?
+	</entry>
+	<entry key="myQna">
+		SELECT *
+		FROM (
+		       SELECT ROWNUM RNUM, A.*
+		       FROM (
+		              	SELECT 
+		                       QNA_NO
+		                     , QNA_TITLE
+		                     , QNA_CONTENT
+		                     , TO_CHAR(REPORT_DATE, 'YYYY-MM-DD') "REPORT_DATE"
+		                     , NVL(ANS_CONTENT, ' ') "ANS_CONTENT"
+		                 FROM QNA
+		                WHERE MEM_NO = ?
+		                ORDER 
+		                   BY 1 DESC) A
+		            )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="qnaListCount">
+	   SELECT 
+		       COUNT(*) COUNT
+		 FROM QNA
+		WHERE MEM_NO = ?
+	</entry>
+	<entry key="gameQnaCount">
+	   SELECT 
+		       COUNT(*) COUNT
+		 FROM GAME_QNA
+		WHERE MEM_NO = ?
+	</entry>
+	<entry key="myReviewList">
+		SELECT 
+		       REVIEW_NO
+		     , ENG_NAME
+		     , KOR_NAME
+		     , CONTENTS
+		     , RECOMMEND
+		     , R.UPLOAD_DATE
+		     , STAR_NO
+		  FROM REVIEW R
+		  JOIN GAME USING(GAME_NO)
+		 WHERE REVIEW_STATUS = 'Y' 
+		   AND R.MEM_NO = ?
+	</entry>
+	<entry key="myReviewList">
+		SELECT
+		          REVIEW_NO
+		        , KOR_NAME
+		        , ENG_NAME
+		        , CONTENTS
+		        , RECOMMEND
+		        , TO_CHAR(R.UPLOAD_DATE, 'YYYY.MM.DD') UPLOAD_DATE
+		        , STAR_NO
+		        , GAME_IMG
+		  FROM REVIEW R
+		  JOIN GAME G USING(GAME_NO)
+		 WHERE REVIEW_STATUS = 'Y'
+		   AND MEM_NO = ?
+		 ORDER
+		    BY 6 DESC
+	</entry>
+	<entry key="myGameQna">    
+		SELECT *
+		FROM (
+		       SELECT ROWNUM RNUM, A.*
+		       FROM (
+		              	SELECT
+						        GQNA_NO
+						      , COMPANY_NAME
+						      , GQNA_TITLE
+						      , GQNA_CONTENT
+						      , TO_CHAR(GQNA_DATE, 'YYYY-MM-DD') "GQNA_DATE"
+						      , NVL(GQNA_ANSWER, ' ') "GQNA_ANSWER"
+						      , ENG_NAME
+						  FROM GAME_QNA
+						  JOIN COMPANY USING(COMPANY_NO)
+                          JOIN GAME USING(GAME_NO)
+						 WHERE GQNA_STATUS = 'Y'
+						   AND MEM_NO = ?
+						 ORDER
+						    BY 1 DESC) A
+		            )
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	<entry key="library">
+		SELECT DISTINCT 
+			   GAME_NO
+		     , KOR_NAME
+		     , ENG_NAME
+		     , GAME_IMG
+             , NVL(STAR_NO, 0) "STAR_NO"
+             , TO_CHAR(PAY_DATE, 'YY/MM/DD') "PAY_DATE"
+		FROM PAY P
+		JOIN PAY_GAME USING(ORDER_NO)
+		JOIN GAME USING(GAME_NO)
+		LEFT JOIN REFUND USING(ORDER_NO)
+        LEFT JOIN REVIEW USING(GAME_NO)
+		WHERE PAY_STATUS = '결제완료'
+		  AND (REFUND_STATUS IS NULL OR REFUND_STATUS = 'N')
+		  AND P.MEM_NO = ?
+	</entry>
+	<entry key="searchMemId">
+	SELECT *
+	      FROM (
+	            SELECT ROWNUM RNUM, A.*
+	              FROM (
+	                    SELECT
+	                          MEM_NO
+	                        , MEM_ID
+	                        , MEM_NAME
+	                        , MEM_NICK
+	                        , MEM_GENDER
+	                        , MEM_EMAIL
+	                        , MEM_PHONE
+	                        , MEM_ADDRESS
+	                        , MEM_INDATE
+	                        , MEM_STATUS
+	                        FROM MEMBER
+	                        WHERE UPPER(MEM_ID)
+	                        LIKE UPPER('%' || ? || '%')
+	                       ORDER
+	                          BY MEM_NO DESC
+	                    ) A
+	            )
+	     WHERE RNUM BETWEEN ? AND ?
+	</entry>
+</properties>

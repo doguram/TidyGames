@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<entry key="pointListCount">
+	
+	      
+      	SELECT
+      			COUNT(*) count
+  		  FROM POINT
+         WHERE MEM_NO = ?
+	
+	
+	</entry>
+	
+	
+	<entry key="selectPoint">
+        SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                  SELECT
+                     MEM_NO
+                    , POINT_AMOUNT
+                    , TO_CHAR(POINT_DATE, 'YYYY-MM-DD') "POINT_DATE"
+                    , POINT_CONTENT
+                    , ORDER_NO
+               FROM POINT
+              WHERE MEM_NO = ?
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	  
+	</entry>
+	
+	
+	
+	
+	<entry key="selectAllPoint">
+	 	 	    SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                    SELECT
+                      MEM_NO
+                    , POINT_AMOUNT
+                    , TO_CHAR(POINT_DATE, 'YYYY-MM-DD') "POINT_DATE"
+                    , POINT_CONTENT
+                    , ORDER_NO
+               FROM POINT
+              WHERE MEM_NO = ?
+                AND "POINT_DATE" BETWEEN TO_DATE(?)
+                                     AND TO_DATE(?)
+		                ) A
+		              
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+	</entry>
+	
+	<entry key="selectSave">
+	
+		 	    SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                          SELECT
+                                  MEM_NO
+                                , POINT_AMOUNT
+                                , TO_CHAR(POINT_DATE, 'YYYY-MM-DD') "POINT_DATE"
+                                , POINT_CONTENT
+                                , ORDER_NO
+                           FROM POINT
+                           WHERE MEM_NO = ?
+                            AND "POINT_DATE" BETWEEN TO_DATE(?)
+                                             AND TO_DATE(?)
+                            AND POINT_AMOUNT > 0
+		                ) A
+		              
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+	</entry>
+	
+	<entry key="selectUse">
+	
+			    SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                         SELECT
+                                  MEM_NO
+                                , POINT_AMOUNT
+                                , TO_CHAR(POINT_DATE, 'YYYY-MM-DD') "POINT_DATE"
+                                , POINT_CONTENT
+                                , ORDER_NO
+                           FROM POINT
+                          WHERE MEM_NO = ?
+                            AND POINT_AMOUNT <![CDATA[ < ]]> 0
+                            AND "POINT_DATE" BETWEEN TO_DATE(?)
+                                                 AND TO_DATE(?)
+		                ) A
+		              
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+                             
+        
+	</entry>
+	
+	<entry key="selectOlddate">
+	    SELECT
+              MEM_NO
+            , POINT_AMOUNT
+            , TO_CHAR(POINT_DATE, 'YYYY-MM-DD') "POINT_DATE"
+            , POINT_CONTENT
+            , ORDER_NO
+       FROM POINT
+      WHERE MEM_NO = ?
+      ORDER BY POINT_DATE ASC
+	  
+	</entry>
+	
+	<entry key="sumPoint">
+			SELECT SUM(POINT_AMOUNT) AS "SUM"
+            FROM POINT
+            GROUP BY MEM_NO
+            HAVING MEM_NO = ?
+	
+	
+	</entry>
+	
+	<entry key="adPointList">
+		   
+		 SELECT 
+		   MEM_NO
+         , MEM_ID
+         , (SELECT SUM(POINT_AMOUNT)
+            FROM POINT P
+            GROUP BY MEM_NO HAVING M.MEM_NO=P.MEM_NO) AS "SUM"
+     	  FROM MEMBER M
+	
+	
+	</entry>
+	
+	
+	
+	<entry key="adInsertPoint">
+			
+			INSERT
+				INTO POINT
+				        (
+				          MEM_NO
+				        , POINT_AMOUNT
+				        , POINT_DATE
+				        , POINT_CONTENT
+				       
+				        )
+					VALUES
+					        (
+					          ?
+					        , ?
+					        , SYSDATE
+					        , ?
+					        )
+		
+	
+	</entry>
+	
+	<entry key="adPointSearch">
+			 SELECT 
+		   MEM_NO
+         , MEM_ID
+         , (SELECT SUM(POINT_AMOUNT)
+            FROM POINT P
+            GROUP BY MEM_NO HAVING M.MEM_NO=P.MEM_NO) AS "SUM"
+     	  FROM MEMBER M
+          WHERE MEM_ID = ?
+	
+	
+	
+	
+	
+	
+	</entry>
+	
+	<entry key="memNick">
+	SELECT MEM_NICK
+		FROM MEMBER
+		JOIN POINT USING(MEM_NO)
+		WHERE MEM_NO =?
+		GROUP BY MEM_NICK
+	
+	
+	
+	
+	</entry>
+	
+
+</properties>

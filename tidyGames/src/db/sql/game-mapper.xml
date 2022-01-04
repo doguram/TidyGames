@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+
+	<entry key="selectList">	    
+      SELECT G.GAME_NO
+           , COMPANY_NO
+           , KOR_NAME
+           , ENG_NAME
+           , TO_CHAR(RELEASE_DATE, '""YYYY"년 "MM"월 "DD"일"') "RELEASE_DATE"
+           , PRICE
+           , POINT
+           , GAME_STATUS
+           , (FILE_PATH || CHANGE_NAME) "GAME_IMG"
+           , (SELECT COUNT(*) FROM WISHLIST W WHERE W.MEM_NO= ? AND G.GAME_NO =W.GAME_NO ) AS count
+         FROM GAME G
+         JOIN UPLOAD_FILE U ON (G.GAME_NO = U.REF_BNO)
+		 WHERE UPPER(KOR_NAME || ENG_NAME) LIKE UPPER('%' || ? || '%') AND CONFIRM = 'Y' AND FILE_TYPE = 1
+	</entry>
+	
+	<entry key="selectGame">
+		SELECT
+			   GAME_NO
+		     , COMPANY_NO
+		     , KOR_NAME
+		     , ENG_NAME
+		     , TO_CHAR(RELEASE_DATE, '""YYYY"년 "MM"월 "DD"일"') "RELEASE_DATE"
+		     , PRICE
+		     , GAME_INTRO
+		     , CONFIRM
+		     , UPGAME
+		     , UPLOAD_DATE
+		     , POINT
+		     , GAME_STATUS
+		     , (SELECT COUNT(*) FROM WISHLIST W WHERE W.MEM_NO= ? AND G.GAME_NO =W.GAME_NO ) AS count
+		  FROM GAME G
+		 WHERE GAME_NO = ?
+	</entry>
+	
+
+
+	<entry key="insertReview">
+		INSERT
+		  INTO REVIEW
+		    (
+		      REVIEW_NO
+		    , GAME_NO
+		    , MEM_NO
+		    , CONTENTS
+		    , STAR_NO
+		    ) 
+		    VALUES
+		    ( SEQ_REVIEW_NO.NEXTVAL
+		    , ?
+		    , ?
+		    , ?
+		    , ?
+		    )
+	</entry>
+	
+	<entry key="selectReviewList">
+		SELECT
+		       REVIEW_NO
+		     , GAME_NO
+		     , MEM_NICK "WRITER"
+		     , CONTENTS
+		     , RECOMMEND
+		     , TO_CHAR(UPLOAD_DATE, 'YY/MM/DD HH:MI') "UPLOAD_DATE"
+		     , STAR_NO
+		     , MEM_NO
+		  FROM REVIEW
+		  JOIN MEMBER USING (MEM_NO)
+		 WHERE REVIEW_STATUS = 'Y'
+		   AND GAME_NO = ?
+		 ORDER
+		    BY REVIEW_NO DESC
+	</entry>
+	<entry key="selectGameList">
+	SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		SELECT
+	G.GAME_NO "GAME_NO"
+	, C.COMPANY_NAME "COMPANY_NAME"
+	, G.ENG_NAME "ENG_NAME"
+	, TO_CHAR(G.UPLOAD_DATE, '""YYYY"-"MM"-"DD""') "UPLOAD_DATE"
+	, G.CONFIRM "CONFIRM"
+	, G.GAME_STATUS "GAME_STATUS"
+	FROM GAME G
+	INNER JOIN COMPANY C
+	ON G.COMPANY_NO = C.COMPANY_NO
+
+	ORDER
+	BY G.GAME_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectListCount">
+		SELECT
+		       COUNT(*) COUNT
+		  FROM GAME
+		 WHERE GAME_STATUS = 'Y'
+
+	</entry>
+	
+	<entry key="selectGameCategory">
+		SELECT C.CATEGORY_NAME
+		  FROM CATEGORY C ,GAME_CATEGORY GC
+		 WHERE GC.CATEGORY_NO = C.CATEGORY_NO AND GC.GAME_NO = ?
+	</entry>
+	
+	<entry key="selectGameListGC">
+		SELECT
+			  GAME_NO
+		    , KOR_NAME
+		    , ENG_NAME
+		    , PRICE
+		    , UPLOAD_DATE
+		    , CONFIRM
+		    , UPGAME
+		  FROM GAME
+		 WHERE COMPANY_NO = ?
+	</entry>
+	
+	<entry key="insertGame">
+  		INSERT
+			  INTO GAME
+			  (
+			    GAME_NO 
+			  , COMPANY_NO
+			  , KOR_NAME
+			  , ENG_NAME
+			  , RELEASE_DATE
+			  , PRICE
+			  , GAME_INTRO
+			  , UPLOAD_DATE
+			  , GAME_IMG
+			  )
+			  VALUES
+			  (
+			    SEQ_GAME_NO.NEXTVAL
+			  , ?
+			  , ?
+			  , ?
+			  , TO_CHAR(TO_DATE(?), 'YYYY-MM-DD')
+			  , ?
+			  , ?
+			  , SYSDATE
+			  , ?
+			  )
+	</entry>
+	
+	<entry key="insertAttachment">
+		INSERT
+			  INTO UPLOAD_FILE
+			  (
+			    FILE_NO
+			  , GAME_NO
+			  , REF_BNO
+			  , ORIGIN_NAME
+			  , CHANGE_NAME
+			  , UPLOAD_DATE
+			  , FILE_PATH
+			  , FILE_TYPE
+			  )
+			  VALUES
+			  (
+			    SEQ_UP_NO.NEXTVAL
+			  , SEQ_GAME_NO.CURRVAL
+			  , SEQ_GAME_NO.CURRVAL
+			  , ?
+			  , ?
+			  , SYSDATE
+			  , ?
+			  , ?
+			  )
+	</entry>
+	<entry key="selectAttachment">
+		SELECT
+		       FILE_NO
+		     , ORIGIN_NAME
+		     , CHANGE_NAME
+		     , FILE_PATH
+		     , FILE_TYPE
+		  FROM UPLOAD_FILE
+		 WHERE GAME_NO = ? AND FILE_TYPE = 1
+	</entry>
+	
+	<entry key="selectAttachmentList">
+		SELECT
+		       FILE_NO
+		     , ORIGIN_NAME
+		     , CHANGE_NAME
+		     , FILE_PATH
+		     , FILE_TYPE
+		  FROM UPLOAD_FILE
+		 WHERE GAME_NO = ?
+		 ORDER BY FILE_TYPE
+	</entry>
+	
+	<entry key="updateGame">
+		UPDATE
+		       GAME
+		   SET KOR_NAME =?
+		     , ENG_NAME =?
+		     , GAME_INTRO = ?
+		     , PRICE = ?
+		WHERE GAME_NO = ?
+	</entry>
+	
+	<entry key="updateAttachment">
+		UPDATE
+		       UPLOAD_FILE
+		   SET ORIGIN_NAME = ?
+		     , CHANGE_NAME = ?
+		     , FILE_PATH = ?
+		WHERE FILE_NO = ?
+	</entry>
+	
+	<entry key="insertNewAttachment">
+		INSERT
+		  INTO UPLOAD_FILE
+		  (
+		    FILE_NO
+		  , GAME_NO
+		  , REF_BNO
+		  , ORIGIN_NAME
+		  , CHANGE_NAME
+		  , UPLOAD_DATE
+		  , FILE_PATH
+		  , FILE_TYPE
+		  )
+		  VALUES
+		  (
+		    SEQ_UP_NO.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  , SYSDATE
+		  , ?
+		  , ?
+		  )
+	
+	</entry>
+	
+      <entry key="forSaleGame">
+      SELECT
+            GAME_NO
+           , COMPANY_NO
+           , KOR_NAME
+           , ENG_NAME
+           , TO_CHAR(RELEASE_DATE, '""YYYY"년 "MM"월 "DD"일"') "RELEASE_DATE"
+           , PRICE
+           , GAME_INTRO
+           , CONFIRM
+           , UPGAME
+           , UPLOAD_DATE
+           , POINT
+           , GAME_STATUS
+           , (SELECT COUNT(*) FROM WISHLIST W WHERE G.GAME_NO =W.GAME_NO ) AS count
+        FROM GAME G
+       WHERE GAME_NO = ?
+   </entry>
+   
+	<entry key="selectStarAvg">
+		SELECT
+		      ROUND(CEIL(AVG(STAR_NO)),-1) "STAR_AVG"
+		  FROM REVIEW
+		 WHERE GAME_NO = ?
+	</entry>
+	
+	<entry key="insertCategory">
+		INSERT 
+	      INTO GAME_CATEGORY
+	    VALUES 
+	    (
+	      SEQ_GAME_NO.CURRVAL
+	    , ?
+	    )
+	</entry>
+	
+	<entry key="uploadUpdate">
+	UPDATE
+		       GAME
+		   SET CONFIRM =?		     
+		WHERE GAME_NO = ?
+	</entry>
+	
+	<entry key="gameDelete">
+	UPDATE
+		       GAME
+		   SET GAME_STATUS = 'N'		     
+		WHERE GAME_NO = ?
+	
+	</entry>
+	<entry key="selectMainGameList">
+		SELECT
+		       GAME_NO
+		     , KOR_NAME
+		     , ENG_NAME
+		     , PRICE
+		     , CONFIRM
+		     , UPGAME
+		     , UPLOAD_DATE
+		     , POINT
+		     , GAME_IMG
+		  FROM (SELECT
+		               GAME_NO
+		             , KOR_NAME
+		             , ENG_NAME
+		             , PRICE
+		             , CONFIRM
+		             , UPGAME
+		             , UPLOAD_DATE
+		             , POINT
+		             , GAME_IMG
+		          FROM GAME
+		         WHERE CONFIRM = 'Y'
+		         ORDER BY DBMS_RANDOM.VALUE)
+		 WHERE ROWNUM &lt;= 3
+	</entry>
+	
+
+</properties>

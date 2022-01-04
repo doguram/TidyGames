@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertQna">
+		INSERT 
+		  INTO QNA
+		  	  (
+                QNA_NO
+              , MEM_NO
+              , QNA_TITLE
+              , QNA_CONTENT
+			  ) 
+			    VALUES 
+			  (
+			    SEQ_QNO_K.NEXTVAL
+			  , ?
+			  , ?
+			  , ?
+			  )
+	</entry>
+	<entry key="insertAttachment">
+		INSERT
+			  INTO QNA_FILE
+			  (
+			   FILE_NO
+			 , QNA_NO
+			 , FILE_ORIGIN
+			 , FILE_CHANGE
+			 , FILE_PATH
+			  )
+			  VALUES
+			  (
+			    SEQ_QFNO_K.NEXTVAL
+			  , SEQ_QNO_K.CURRVAL
+			  , ?
+			  , ?
+			  , ?
+			  )
+	</entry>
+	<entry key="selectListCount">
+		
+	</entry>
+	<entry key="qnaWaitList">
+		SELECT *
+		  FROM
+		       (SELECT ROWNUM RNUM, A.* 
+		          FROM
+		                (SELECT 
+		                  QNA_NO
+		                , MEM_NO
+		                , MEM_ID
+		                , MEM_NICK
+		                , QNA_TITLE
+		                , TO_CHAR(REPORT_DATE, 'YY/MM/DD') "REPORT_DATE"
+		                , ANS_CONFIRM
+		             FROM QNA
+		             JOIN MEMBER USING(MEM_NO)
+		            WHERE QNA_STATUS = 'Y'
+		            ORDER
+                       BY ANS_CONFIRM ASC, QNA_NO DESC
+		            ) A
+		        )
+		    WHERE RNUM BETWEEN ? AND ?
+
+	</entry>
+	<entry key="selectListCount">
+		SELECT 
+		       COUNT(*) "COUNT" 
+		  FROM QNA
+	</entry>
+	<entry key="qnaDetailView">
+		SELECT
+			  QNA_NO 
+		    , MEM_NO
+		    , MEM_NICK
+		    , QNA_TITLE
+		    , QNA_CONTENT
+		    , REPORT_DATE
+		    , NVL(ANS_CONTENT, ' ') "ANS_CONTENT"
+		    , ANS_DATE
+		 FROM QNA
+		 JOIN MEMBER USING(MEM_NO)
+		WHERE QNA_NO = ?
+	</entry>
+	<entry key="selectAttachment">
+		SELECT
+		       FILE_NO
+		     , FILE_ORIGIN
+		     , FILE_CHANGE
+		     , FILE_PATH
+		  FROM QNA_FILE
+		 WHERE QNA_NO =  ?
+		   AND FILE_STATUS = 'Y'
+	</entry>
+	<entry key="qnaAnswer">
+		UPDATE QNA 
+		   SET ANS_CONTENT = ?
+		     , ANS_DATE = SYSDATE
+		     , ANS_CONFIRM = 'Y'
+		 WHERE QNA_NO = ?
+	</entry>
+	
+	<entry key="noticeSelectListCount">
+		SELECT
+		       COUNT(*) count
+		  FROM NOTICE
+		 WHERE NOTI_STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectNoticeList">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+		                       NOTI_NO
+		                     , NOTI_TITLE
+		                     , TO_CHAR(NOTI_DATE, 'YYYY/MM/DD') "NOTI_DATE"
+		                     , NOTI_CONTENT
+		                     , NOTI_WRITER
+		                  FROM NOTICE
+		                 WHERE NOTI_STATUS = 'Y'
+		                 ORDER
+		                    BY NOTI_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectNotice">
+		SELECT NOTI_NO
+		     , NOTI_TITLE
+		     , TO_CHAR(NOTI_DATE, 'YYYY/MM/DD') "NOTI_DATE"
+		     , NOTI_CONTENT
+		     , NOTI_WRITER
+		  FROM NOTICE
+		WHERE NOTI_NO = ?
+		  AND NOTI_STATUS = 'Y'
+	</entry>
+	
+	<entry key="firstNoticeNo">
+		SELECT
+		       NOTI_NO "FIRSTNOTICE"
+		  FROM (
+		        SELECT NOTI_NO
+		          FROM NOTICE
+		         WHERE NOTI_STATUS = 'Y'
+		         ORDER
+		            BY NOTI_NO
+		        )
+		 WHERE ROWNUM = 1
+	</entry>
+	
+	<entry key="lastNoticeNo">
+		SELECT
+		       NOTI_NO "LASTNOTICE"
+		  FROM (
+		        SELECT NOTI_NO
+		          FROM NOTICE
+		         WHERE NOTI_STATUS = 'Y'
+		         ORDER
+		            BY NOTI_NO DESC
+		        )
+		 WHERE ROWNUM = 1
+	</entry>
+	
+	<entry key="insertNotice">
+		INSERT
+		  INTO NOTICE
+		  (
+		  	NOTI_NO
+		  , NOTI_TITLE
+		  , NOTI_CONTENT
+          , NOTI_WRITER
+		  )
+		  VALUES
+		  (
+		  	SEQ_NOTI_NO.NEXTVAL
+          , ?
+          , ?
+          , ?
+		  )
+	</entry>
+	
+	<entry key="insertFile">
+		INSERT
+		  INTO NOTICE_FILE
+		  (
+		  	FILE_NO
+		  , NOTI_NO
+		  , FILE_ORIGIN
+		  , FILE_CHANGE
+		  , FILE_PATH
+		  )
+		  VALUES
+		  (
+		  	SEQ_NOTICEFILE_NO.NEXTVAL
+		  , SEQ_NOTI_NO.CURRVAL
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+	<entry key="selectFileList">
+		SELECT 
+		       FILE_NO
+		     , NOTI_NO
+		     , FILE_ORIGIN
+		     , FILE_CHANGE
+		     , FILE_PATH
+		  FROM NOTICE_FILE N
+		  JOIN NOTICE USING (NOTI_NO)
+		   WHERE NOTI_NO = ?
+		   AND FILE_STATUS = 'Y'
+		   AND NOTI_STATUS = 'Y'
+	</entry>
+	
+	<entry key="deleteNotice">
+		UPDATE NOTICE
+		   SET NOTI_STATUS = 'N'
+		 WHERE NOTI_NO = ?
+	</entry>
+	
+	<entry key="searchTitleCount">
+		SELECT
+		       COUNT(*) count
+		  FROM NOTICE
+		 WHERE NOTI_STATUS = 'Y'
+		   AND NOTI_TITLE LIKE '%' || ? || '%'
+	</entry>
+	
+	<entry key="searchContentCount">
+		SELECT
+		       COUNT(*) count
+		  FROM NOTICE
+		 WHERE NOTI_STATUS = 'Y'
+		   AND NOTI_CONTENT LIKE '%' || ? || '%'
+	</entry>
+	
+	<entry key="selectTitleList">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+		                       NOTI_NO
+		                     , NOTI_TITLE
+		                     , TO_CHAR(NOTI_DATE, 'YYYY/MM/DD') "NOTI_DATE"
+		                     , NOTI_CONTENT
+		                     , NOTI_WRITER
+		                  FROM NOTICE
+		                 WHERE NOTI_STATUS = 'Y'
+		                   AND NOTI_TITLE LIKE '%' || ? || '%'
+		                 ORDER
+		                    BY NOTI_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectContentList">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+		                       NOTI_NO
+		                     , NOTI_TITLE
+		                     , TO_CHAR(NOTI_DATE, 'YYYY/MM/DD') "NOTI_DATE"
+		                     , NOTI_CONTENT
+		                     , NOTI_WRITER
+		                  FROM NOTICE
+		                 WHERE NOTI_STATUS = 'Y'
+		                   AND NOTI_CONTENT LIKE '%' || ? || '%'
+		                 ORDER
+		                    BY NOTI_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="updateNotice">
+		UPDATE NOTICE
+		   SET NOTI_TITLE = ?
+		     , NOTI_CONTENT = ?
+		 WHERE NOTI_NO = ?
+		   AND NOTI_STATUS = 'Y'
+	</entry>
+	
+	<entry key="updateFileStatus">
+		UPDATE NOTICE_FILE
+		   SET FILE_STATUS = 'N'
+		 WHERE FILE_NO = ?
+		   AND FILE_STATUS = 'Y'	 
+	</entry>
+	
+	<entry key="updateFile">
+		INSERT
+		  INTO NOTICE_FILE
+		  (
+		  	FILE_NO
+		  , NOTI_NO
+		  , FILE_ORIGIN
+		  , FILE_CHANGE
+		  , FILE_PATH
+		  )
+		  VALUES
+		  (
+		  	SEQ_NOTICEFILE_NO.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+</properties>

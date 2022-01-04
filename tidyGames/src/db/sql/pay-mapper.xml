@@ -1,0 +1,614 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="countCart">
+		SELECT COUNT(*) count
+		  FROM CART
+		 WHERE MEM_NO = ?
+		   AND GAME_NO = ?
+  
+	</entry>
+
+
+	<entry key ="insertCart" >
+		INSERT 
+	      INTO CART
+	       (
+	      MEM_NO
+	    , GAME_NO
+	       )
+	      VALUES
+		  (
+		      ?
+		    , ?
+		  )
+	</entry>
+	
+	<entry key="selectCart">
+	
+				SELECT    
+						  MEM_NO	
+					    , GAME_NO
+					    , GAME_IMG
+					    , KOR_NAME
+					    , ENG_NAME
+					    , GAME_INTRO
+					    , PRICE
+					    , POINT
+					    , MEM_NICK
+					    , PRICE - PRICE*POINT  "DISCOUNTPRICE"
+				  FROM CART
+				  JOIN GAME USING(GAME_NO)
+				  JOIN MEMBER USING(MEM_NO)
+				 WHERE MEM_NO = ?
+				   AND GAME_STATUS = 'Y'
+			
+	
+	
+	</entry>
+
+
+	<entry key ="deleteCart">
+	
+		DELETE
+		  FROM CART
+		 WHERE MEM_NO = ?
+		   AND GAME_NO = ?
+		
+	
+	
+	
+	</entry>
+	
+	
+	<entry key="orderListCount">
+		SELECT
+      			COUNT(*) count
+  		  FROM PAY_GAME
+          JOIN PAY P USING(ORDER_NO)
+         WHERE MEM_NO = ?
+	
+	
+	
+	</entry>
+	
+	
+	
+	
+	
+	<entry key = "orderList">
+		            
+        SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                              SELECT
+			          ORDER_NO
+			        , GAME_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , KOR_NAME
+			        , ENG_NAME
+			        , GAME_IMG
+			        , G.PRICE - G.PRICE*G.POINT  "DISCOUNTPRICE"
+					, PRICE
+			FROM PAY_GAME PG
+			JOIN PAY P USING(ORDER_NO)
+			JOIN GAME G USING(GAME_NO)
+			WHERE MEM_NO = ?
+
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+			
+	
+	</entry>
+	
+	<entry key="orderSearch">
+         
+        SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                  SELECT
+			          ORDER_NO
+			        , GAME_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , KOR_NAME
+			        , ENG_NAME
+			        , GAME_IMG
+			        , G.PRICE - G.PRICE*G.POINT  "DISCOUNTPRICE"
+					, PRICE
+			FROM PAY_GAME PG
+			JOIN PAY P USING(ORDER_NO)
+			JOIN GAME G USING(GAME_NO)
+			WHERE MEM_NO = ?
+            AND UPPER(KOR_NAME || ENG_NAME) LIKE UPPER('%' || ? || '%')
+
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+	</entry>
+	
+	<entry key="orderDescDate">
+		            
+        SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+                SELECT
+			          ORDER_NO
+			        , GAME_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , KOR_NAME
+			        , ENG_NAME
+			        , GAME_IMG
+			        , G.PRICE - G.PRICE*G.POINT  "DISCOUNTPRICE"
+					, PRICE
+			FROM PAY_GAME PG
+			JOIN PAY P USING(ORDER_NO)
+			JOIN GAME G USING(GAME_NO)
+			WHERE MEM_NO = ?
+            AND PAY_DATE BETWEEN TO_DATE(?) AND TO_DATE(?)
+            ORDER BY PAY_DATE DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+	
+	</entry>
+	
+	
+	<entry key="orderAscDate">
+	            
+        SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+              	SELECT
+			          ORDER_NO
+			        , GAME_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , KOR_NAME
+			        , ENG_NAME
+			        , GAME_IMG
+			        , G.PRICE - G.PRICE*G.POINT  "DISCOUNTPRICE"
+					, PRICE
+			FROM PAY_GAME PG
+			JOIN PAY P USING(ORDER_NO)
+			JOIN GAME G USING(GAME_NO)
+			WHERE MEM_NO = ?
+            AND PAY_DATE BETWEEN TO_DATE(?) AND TO_DATE(?)
+            ORDER BY PAY_DATE ASC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	
+	
+	
+	
+	</entry>
+	
+	
+	<entry key="adOrderList">
+	
+			SELECT
+			          ORDER_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+					, MEM_ID
+			FROM PAY P
+            JOIN MEMBER USING(MEM_NO)
+		
+	
+	</entry>
+	
+	
+		<entry key="adOrderMemIdSearch">
+	
+			SELECT
+			          ORDER_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+					, MEM_ID
+			FROM PAY P
+            JOIN MEMBER USING(MEM_NO)
+            WHERE MEM_ID = ?
+		
+	
+	</entry>
+	
+		<entry key="adOrderorderNoSearch">
+	
+			SELECT
+			          ORDER_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+					, MEM_ID
+			FROM PAY P
+            JOIN MEMBER USING(MEM_NO)
+            WHERE ORDER_NO = ?
+		
+	
+	</entry>
+	
+	
+	<entry key="adDateOrderList">
+	
+			SELECT
+			          ORDER_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+					, MEM_ID
+			FROM PAY P
+            JOIN MEMBER USING(MEM_NO)
+			WHERE "PAY_DATE" BETWEEN TO_DATE(?) AND TO_DATE(?)
+	
+	</entry>
+
+	
+	<entry key = "rfOrderList">
+			SELECT
+			          ORDER_NO
+			        , GAME_NO
+			        , MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , KOR_NAME
+			        , ENG_NAME
+			        , GAME_IMG
+			        , G.PRICE - G.PRICE*G.POINT  "DISCOUNTPRICE"
+					, PRICE
+			FROM PAY_GAME PG
+			JOIN PAY P USING(ORDER_NO)
+			JOIN GAME G USING(GAME_NO)
+			WHERE MEM_NO = ?
+			AND ORDER_NO =?
+			
+
+	</entry>
+	
+	
+	<!-- 환불 결제정보 -->
+	<entry key ="payInfo">
+			SELECT   
+					  ORDER_NO
+			        , P.MEM_NO
+			        , PAY_AMOUNT
+			        , PAY_STATUS
+			        , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') "PAY_DATE"
+			        , PAY_METHOD
+			        , POINT_AMOUNT
+			FROM PAY P
+			JOIN POINT PO USING(ORDER_NO)
+			WHERE ORDER_NO = ?
+			AND P.MEM_NO = ?
+				
+	
+	</entry>
+	
+	
+	<entry key="memInfo">
+	  SELECT
+              MEM_ID
+            , MEM_NICK
+            , MEM_EMAIL
+        FROM MEMBER
+       WHERE MEM_NO = ?
+	
+	
+	</entry>
+	<entry key="adRefundList">
+		SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+		
+	</entry>
+	
+	<entry key="adRefundMemIdSearch">
+			SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+        WHERE MEM_ID = ?
+	
+	
+	</entry>
+	
+		<entry key="adRefundorderNoSearch">
+			SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+        WHERE ORDER_NO = ?
+	
+	
+	</entry>
+	
+	
+	
+	
+	
+	<entry key="adAllRefundList">
+		SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+		 WHERE "REFUND_DATE" BETWEEN TO_DATE(?) AND TO_DATE(?)
+	</entry>
+	<entry key="adComfirmRefundList">
+		SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+		 WHERE "REFUND_DATE" BETWEEN TO_DATE(?) AND TO_DATE(?)
+		AND REFUND_STATUS = 'Y'
+	
+	</entry>
+	
+		<entry key="adNoComfirmRefundList">
+		SELECT
+			  REFUND_NO
+			 , PAY.MEM_NO
+			 , ORDER_NO
+			 , REFUND
+			 , ADD_WRITING
+			 , TO_CHAR(REFUND_DATE, 'YYYY-MM-DD HH:MI:SS') AS "REFUND_DATE"
+			 , REFUND_STATUS
+			 , MEM_ID
+			 , PAY_AMOUNT
+			 , TO_CHAR(PAY_DATE, 'YYYY-MM-DD') AS "PAY_DATE"
+		FROM REFUND
+		JOIN MEMBER USING(MEM_NO)
+		JOIN PAY USING(ORDER_NO)
+		 WHERE "REFUND_DATE" BETWEEN TO_DATE(?) AND TO_DATE(?)
+		AND REFUND_STATUS = 'N'
+	
+	</entry>
+	
+	
+	
+	
+	<entry key="refundContent">
+			  SELECT
+         			 REFUND
+        		   , ADD_WRITING
+			     FROM REFUND
+			    WHERE MEM_NO = ?
+			      AND ORDER_NO = ? 
+	
+	
+	
+	</entry>
+	
+	<entry key="refundUpdate">
+		 UPDATE REFUND
+      SET REFUND_STATUS = 'Y'
+      WHERE ORDER_NO = ?
+	
+	</entry>
+	
+	<entry key="refundUpdate2">
+		UPDATE PAY
+		   SET PAY_STATUS = '환불완료'
+		WHERE ORDER_NO = ?   
+	</entry>
+	
+	
+	
+	
+	<entry key="enrollRefund">
+ 		INSERT
+		INTO REFUND
+		(
+		   REFUND_NO
+		 , MEM_NO
+		 , ORDER_NO
+		 , REFUND
+		 , ADD_WRITING
+		 , REFUND_DATE
+		 
+		 )
+	 VALUES
+		 (
+		      SEQ_REFUND_NO.NEXTVAL
+		    , ?
+		    , ?
+		    , ?
+		    , ?
+		    , SYSDATE
+		    )
+    
+	
+	
+	
+	</entry>
+	
+	
+	<entry key="insertPay">
+	
+	INSERT 
+	  INTO PAY
+			(ORDER_NO
+			, MEM_NO
+			, PAY_AMOUNT
+			, PAY_STATUS
+			, PAY_DATE
+			, PAY_METHOD
+			)
+	VALUES
+			(
+			    SEQ_ORDER_NO.nextval
+			 , ?
+			 , ?
+			 , '결제완료'
+			 , SYSDATE
+			 , ?
+			 )
+ 
+	
+	
+	
+	</entry>
+	
+	<entry key="selectSeq">
+		select seq_order_no.currval
+	 	from dual
+	</entry>
+	
+	<entry key="insertPayGame">
+		 INSERT
+		    INTO PAY_GAME
+				 (
+				  ORDER_NO
+				, GAME_NO
+				    )
+		VALUES 
+				(
+				 SEQ_ORDER_NO.CURRVAL
+				,?
+				)
+					
+	
+	</entry>
+	
+	<entry key="usePoint">
+		INSERT
+		  INTO POINT
+				(
+				  MEM_NO
+				 , POINT_AMOUNT
+				 , POINT_DATE
+				 , POINT_CONTENT
+				 , ORDER_NO
+				 )
+				 VALUES
+				 ( 
+				   ?
+				 , ? * -1
+				 , SYSDATE
+				 , '결제시사용'
+				 , SEQ_ORDER_NO.CURRVAL
+				 )
+ 
+	
+	
+	
+	</entry>
+	
+	<entry key="savePoint">
+			 INSERT
+               INTO POINT
+					(
+					   MEM_NO
+					 , POINT_AMOUNT
+					 , POINT_DATE
+					 , POINT_CONTENT
+					 , ORDER_NO
+					 )
+ 			  VALUES
+					 ( 
+					   ?
+					 , ?
+					 , SYSDATE
+					 , '결제적립'
+					 , SEQ_ORDER_NO.CURRVAL
+					 )
+	
+	
+	
+	</entry>
+	
+	
+	<entry key ="deleteAllCart">
+		DELETE 
+		  FROM CART 
+		 WHERE MEM_NO = ?
+	
+	
+	
+	
+	</entry>
+	
+	
+
+</properties>

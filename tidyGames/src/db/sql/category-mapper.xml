@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+
+	<entry key="selectCategoryList">
+		SELECT
+		       CATEGORY_NO
+		     , CATEGORY_NAME
+		     , CATEGORY_STATUS		    
+		  FROM CATEGORY
+	</entry>
+
+	<entry key="updateCategory">
+		UPDATE CATEGORY
+		SET
+		CATEGORY_NAME = ?
+		WHERE
+		CATEGORY_NAME = ?
+
+	</entry>
+	
+		<entry key="insertCategory">
+		INSERT INTO CATEGORY
+				(CATEGORY_NO,
+				CATEGORY_NAME)
+		VALUES (SEQ_CATE_NO.NEXTVAL,
+				 ?)
+	</entry>
+	
+
+</properties>

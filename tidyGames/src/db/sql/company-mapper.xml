@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="selectGameList">
+		SELECT
+		      ROWNUM
+		    , KOR_NAME
+		    , ENG_NAME
+		    , PRICE
+		    , UPLOAD_DATE
+		    , CONFIRM
+		    , UPGAME
+		  FROM GAME
+		 WHERE COMPANY_NO = ?
+	</entry>
+
+</properties>

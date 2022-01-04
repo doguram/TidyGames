@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectList">
+		SELECT 
+		       FAQ_NO
+		     , FAQ_TITLE
+		     , FAQ_CONTENT
+		     , CATEGORY_NO
+		     , FAQ_DATE
+		     , FAQ_STATUS
+		     , FAQ_WRITER
+		  FROM FAQ
+		 WHERE FAQ_STATUS = 'Y'
+	</entry>
+	
+	<entry key="insertFaq">
+		INSERT
+		  INTO FAQ
+		     (
+		       FAQ_NO
+		     , FAQ_TITLE
+		     , FAQ_CONTENT
+		     , FAQ_WRITER
+		     )
+		VALUES
+		     (
+		       SEQ_FAQ_NO.NEXTVAL
+		     , ?
+		     , ?
+		     , ?
+		     )
+	</entry>
+	
+	<entry key="deleteFaq">
+		UPDATE FAQ
+		   SET FAQ_STATUS = 'N'
+		 WHERE FAQ_NO = ?
+	</entry>
+	
+	<entry key="selectFaq">
+		SELECT 
+		       FAQ_NO
+		     , FAQ_TITLE
+		     , FAQ_CONTENT
+		     , CATEGORY_NO
+		     , FAQ_DATE
+		     , FAQ_STATUS
+		     , FAQ_WRITER
+		  FROM FAQ
+		 WHERE FAQ_STATUS = 'Y'
+		   AND FAQ_NO = ?
+	</entry>
+	
+	<entry key="updateFaq">
+		UPDATE FAQ
+		   SET FAQ_TITLE = ?
+		     , FAQ_CONTENT = ?
+		 WHERE FAQ_NO = ?
+		   AND FAQ_STATUS = 'Y'
+	</entry>
+</properties>

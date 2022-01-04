@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<entry key="insertQna">
+		INSERT 
+		  INTO QNA
+		  	  (
+                QNA_NO
+              , MEM_NO
+              , QNA_TITLE
+              , QNA_CONTENT
+			  ) 
+			    VALUES 
+			  (
+			    SEQ_QNO_K.NEXTVAL
+			  , ?
+			  , ?
+			  , ?
+			  )
+	</entry>
+	<entry key="insertAttachment">
+		INSERT
+			  INTO QNA_FILE
+			  (
+			   FILE_NO
+			 , QNA_NO
+			 , FILE_ORIGIN
+			 , FILE_CHANGE
+			 , FILE_PATH
+			  )
+			  VALUES
+			  (
+			    SEQ_QFNO_K.NEXTVAL
+			  , SEQ_QNO_K.CURRVAL
+			  , ?
+			  , ?
+			  , ?
+			  )
+	</entry>
+	
+	<entry key="qnaWaitList">
+		SELECT *
+		  FROM
+		       (SELECT ROWNUM RNUM, A.* 
+		          FROM
+		                (SELECT 
+		                  QNA_NO
+		                , MEM_NO
+		                , MEM_ID
+		                , MEM_NICK
+		                , QNA_TITLE
+		                , TO_CHAR(REPORT_DATE, 'YY/MM/DD') "REPORT_DATE"
+		                , ANS_CONFIRM
+		             FROM QNA
+		             JOIN MEMBER USING(MEM_NO)
+		            WHERE QNA_STATUS = 'Y'
+		            ORDER
+                       BY ANS_CONFIRM ASC, QNA_NO DESC
+		            ) A
+		        )
+		    WHERE RNUM BETWEEN ? AND ?
+
+	</entry>
+	<entry key="selectListCount">
+		SELECT 
+		       COUNT(*) "COUNT" 
+		  FROM QNA
+	</entry>
+	<entry key="qnaDetailView">
+		SELECT
+			  QNA_NO 
+		    , MEM_NO
+		    , MEM_NICK
+		    , QNA_TITLE
+		    , QNA_CONTENT
+		    , TO_CHAR(REPORT_DATE, 'YY/MM/DD') "REPORT_DATE"
+		    , NVL(ANS_CONTENT, ' ') "ANS_CONTENT"
+		    , ANS_DATE
+		 FROM QNA
+		 JOIN MEMBER USING(MEM_NO)
+		WHERE QNA_NO = ?
+	</entry>
+	<entry key="selectAttachment">
+		SELECT
+		       FILE_NO
+		     , FILE_ORIGIN
+		     , FILE_CHANGE
+		     , FILE_PATH
+		  FROM QNA_FILE
+		 WHERE QNA_NO =  ?
+		   AND FILE_STATUS = 'Y'
+	</entry>
+	<entry key="qnaAnswer">
+		UPDATE QNA 
+		   SET ANS_CONTENT = ?
+		     , ANS_DATE = SYSDATE
+		     , ANS_CONFIRM = 'Y'
+		 WHERE QNA_NO = ?
+	</entry>
+
+	<entry key="selectGameQnaList">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RNUM, A.*
+		FROM (
+		SELECT
+		ROWNUM "SEQ_NO",
+		GQ.GQNA_NO "GQNA_NO"
+		, G.ENG_NAME "GAME_NAME"
+		, M.MEM_ID "MEM_ID"
+		, M.MEM_NICK "MEM_NICK"
+		, GQ.GQNA_TITLE "GQNA_TITLE"
+		, TO_CHAR(GQ.GQNA_DATE, '""YYYY"-"MM"-"DD""') "GQNA_DATE"
+		, GQ.GQNA_CHECK "GQNA_CHECK"
+		FROM GAME_QNA GQ ,GAME G ,MEMBER M
+		WHERE GQ.GAME_NO = G.GAME_NO AND GQ.MEM_NO = M.MEM_NO
+		AND GQ.GQNA_STATUS = 'Y' AND GQ.COMPANY_NO = ?
+		ORDER
+		BY GQ.GQNA_NO DESC
+		) A
+		)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+
+	<entry key="selectGameQnaListCount">
+		SELECT
+		COUNT(*) COUNT
+		FROM GAME_QNA
+		WHERE COMPANY_NO = ?
+	</entry>
+
+	<entry key="gameQnaDetailView">
+		SELECT
+		GQ.GQNA_NO "GQNA_NO"
+		, G.ENG_NAME "GAME_NAME"
+		,
+		GQ.GQNA_TITLE "GQNA_TITLE"
+		, M.MEM_NICK "MEM_NICK"
+		,
+		TO_CHAR(GQ.GQNA_DATE, 'YYYY-MM-DD HH24:MI:SS') "GQNA_DATE"
+		,
+		GQ.GQNA_CONTENT "GQNA_CONTENT"
+		, C.COMPANY_NAME "COMPANY_NAME"		
+		,TO_CHAR(GQ.GQNA_ANSWER_DATE, 'YYYY-MM-DD HH24:MI:SS') "GQNA_ANSWER_DATE"
+		, GQ.GQNA_ANSWER "GQNA_ANSWER"
+		, GQ.GQNA_CHECK	"GQNA_CHECK"
+		FROM GAME_QNA GQ ,GAME G ,MEMBER M , COMPANY C
+		WHERE
+		GQ.GAME_NO = G.GAME_NO AND GQ.MEM_NO = M.MEM_NO
+		AND GQ.COMPANY_NO =	C.COMPANY_NO 
+		AND GQ.GQNA_NO = ?
+	</entry>
+
+	<entry key="selectGameQnaAttachment">
+		SELECT
+		FILE_NO
+		, FILE_ORIGIN
+		, FILE_CHANGE
+		, FILE_PATH
+		FROM GQNA_FILE
+		WHERE GQNA_NO = ?
+		AND FILE_STATUS = 'Y'
+	</entry>
+
+	<entry key="insertCompanyAnswer">
+		UPDATE GAME_QNA
+		SET
+		GQNA_ANSWER = ? ,
+		GQNA_ANSWER_DATE =
+		SYSDATE,
+		GQNA_CHECK = 'Y'
+		WHERE
+		GQNA_NO = ?
+	</entry>
+
+	<entry key="gameQnaQuestion">
+		SELECT
+		C.COMPANY_NO "COMPANY_NO"
+		,G.GAME_NO "GAME_NO"
+		,G.ENG_NAME "GAME_NAME"
+		FROM COMPANY C, GAME G
+		WHERE C.COMPANY_NO =
+		G.COMPANY_NO
+		AND G.GAME_NO = ?
+	</entry>
+
+	<entry key="insertGameQna">
+		INSERT INTO GAME_QNA (GQNA_NO, MEM_NO, GAME_NO,
+		COMPANY_NO, GQNA_TITLE,
+		GQNA_CONTENT,GQNA_ANSWER_DATE)
+		VALUES
+		(SEQ_GQ_NO.NEXTVAL,?,?,?,?,?,NULL)
+	</entry>
+
+
+	<entry key="insertGameQnaAttachment">
+		INSERT
+		INTO GQNA_FILE
+		(
+		FILE_NO
+		,GQNA_NO
+		,FILE_ORIGIN
+		,FILE_CHANGE
+		,FILE_PATH
+		)
+		VALUES
+		(
+		SEQ_GQFILE_NO.NEXTVAL
+		, SEQ_GQ_NO.CURRVAL
+		, ?
+		, ?
+		, ?
+		)
+	</entry>
+	
+</properties>
+	

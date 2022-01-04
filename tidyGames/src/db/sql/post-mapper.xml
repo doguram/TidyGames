@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectPostListCount">
+		SELECT
+		       COUNT(*) COUNT
+		  FROM POST
+		 WHERE POST_STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectPostList">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+						       POST_NO
+						     , MEM_NICK
+						     , POST_NAME
+						     , POST_VIEW
+						     , POST_LIKE
+						     , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD') "POST_ENROLL"
+						     , POST_NOTICE
+						  FROM POST P
+						  JOIN MEMBER ON (POST_WRITER = MEM_NO)
+						 WHERE P.POST_STATUS = 'Y'
+						 ORDER
+						    BY POST_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="increaseCount">
+		UPDATE
+		       POST
+		   SET POST_VIEW = POST_VIEW+1
+		 WHERE POST_NO = ?
+		   AND POST_STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectPostDetail">
+		SELECT *
+  		  FROM (
+  				SELECT
+		     		   POST_NO
+		             , POST_WRITER
+		             , POST_NAME
+		             , MEM_NICK
+		             , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD HH24:mm:SS') "POST_ENROLL"
+		             , POST_VIEW
+		             , (SELECT COUNT(*) COUNT
+  						FROM POST_LIKE
+ 						WHERE LIKE_POST = ?) "POST_LIKE"
+		             , POST_CONTENT
+		             , LAG(POST_NO) OVER(ORDER BY POST_NO) PREV_NO
+		             , LEAD(POST_NO) OVER(ORDER BY POST_NO) NEXT_NO
+		          FROM POST
+		          JOIN MEMBER ON (POST_WRITER = MEM_NO)
+		         WHERE POST_STATUS = 'Y'
+        		 )
+		 WHERE POST_NO = ?
+	</entry>
+	
+	<entry key="selectPostFile">
+		SELECT
+		        FILE_NO
+		      , FILE_ORIGIN
+		      , FILE_CHANGE
+		      , FILE_PATH
+		   FROM POST_FILE
+		  WHERE FILE_STATUS = 'Y'
+		    AND REF_POST = ?
+	</entry>
+	
+	<entry key="firstPostNo">
+		SELECT
+		       POST_NO FIRSTPOST
+		  FROM (
+		        SELECT POST_NO
+		          FROM POST
+		         ORDER
+		            BY POST_NO
+		        )
+		 WHERE ROWNUM=1
+	</entry>
+	
+	<entry key="lastPostNo">
+		SELECT
+		       POST_NO LASTPOST
+		  FROM (
+		        SELECT POST_NO
+		          FROM POST
+		         ORDER
+		            BY POST_NO DESC
+		        )
+		 WHERE ROWNUM=1
+	</entry>
+	
+	<entry key="insertPost">
+		INSERT
+		  INTO POST
+		  (
+		  	POST_NO
+		  , POST_WRITER
+		  , POST_NAME
+		  , POST_CONTENT
+		  , POST_NOTICE
+		  )
+		  VALUES
+		  (
+		  	SEQ_PNO.NEXTVAL
+		  , ?
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+	<entry key="insertFile">
+		INSERT
+		  INTO POST_FILE
+		  (
+		  	FILE_NO
+		  , REF_POST
+		  , FILE_ORIGIN
+		  , FILE_CHANGE
+		  , FILE_PATH
+		  )
+		  VALUES
+		  (
+		  	SEQ_FNO.NEXTVAL
+		  , SEQ_PNO.CURRVAL
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+	
+	<entry key="deletePost">
+		UPDATE
+		       POST
+		   SET POST_STATUS = 'N'
+		 WHERE POST_NO = ?
+	</entry>
+	
+	<entry key="updatePost">
+	UPDATE
+		   POST
+	   SET POST_NAME = ?
+	     , POST_CONTENT = ?
+	     , POST_MODIFY = SYSDATE
+	 WHERE POST_NO = ?
+	</entry>
+	
+	
+
+	<entry key="nicknamePostCount">
+		SELECT
+		       COUNT(*) COUNT
+		  FROM POST
+		 WHERE POST_STATUS = 'Y'
+		   AND POST_WRITER = (
+		   						SELECT MEM_NO 
+		   						  FROM MEMBER 
+		   						 WHERE MEM_NICK = ?
+		   					  )
+	</entry>
+	
+
+	<entry key="searchPostCount">
+		SELECT
+		       COUNT(*) COUNT
+		  FROM POST
+		 WHERE POST_STATUS = 'Y' 
+		   AND UPPER(POST_NAME) 
+		  LIKE UPPER('%' || ? || '%')
+		    OR UPPER(POST_CONTENT)
+		  LIKE UPPER('%' || ? || '%')
+	</entry>
+	
+	
+
+	<entry key="selectNicknamePost">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+						       POST_NO
+						     , MEM_NICK
+						     , POST_NAME
+						     , POST_VIEW
+						     , POST_LIKE
+						     , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD') "POST_ENROLL"
+						     , POST_NOTICE
+						  FROM POST P
+						  JOIN MEMBER ON (POST_WRITER = MEM_NO)
+						 WHERE P.POST_STATUS = 'Y'
+						   AND POST_WRITER = (
+		   										SELECT MEM_NO 
+		   						  				FROM MEMBER 
+		   						 				WHERE MEM_NICK = ?
+		   					  					)
+						 ORDER
+						    BY POST_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="searchRecentPost">
+		SELECT *
+			  FROM (
+			        SELECT ROWNUM RNUM, A.*
+			          FROM (
+			                SELECT 
+							       POST_NO
+							     , MEM_NICK
+							     , POST_NAME
+							     , POST_VIEW
+							     , POST_LIKE
+							     , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD') "POST_ENROLL"
+							     , POST_NOTICE
+							  FROM POST P
+							  JOIN MEMBER ON (POST_WRITER = MEM_NO)
+							 WHERE P.POST_STATUS = 'Y'
+							   AND UPPER(POST_NAME) 
+		 					  LIKE UPPER('%' || ? || '%')
+		    					OR UPPER(POST_CONTENT)
+		  					  LIKE UPPER('%' || ? || '%')
+							 ORDER
+							    BY POST_NO DESC
+			                ) A
+			        )
+			 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+
+	<entry key="searchViewPost">
+		SELECT *
+			  FROM (
+			        SELECT ROWNUM RNUM, A.*
+			          FROM (
+			                SELECT 
+							       POST_NO
+							     , MEM_NICK
+							     , POST_NAME
+							     , POST_VIEW
+							     , POST_LIKE
+							     , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD') "POST_ENROLL"
+							     , POST_NOTICE
+							  FROM POST P
+							  JOIN MEMBER ON (POST_WRITER = MEM_NO)
+							 WHERE P.POST_STATUS = 'Y'
+							   AND UPPER(POST_NAME) 
+		 					  LIKE UPPER('%' || ? || '%')
+		    					OR UPPER(POST_CONTENT)
+		  					  LIKE UPPER('%' || ? || '%')
+							 ORDER
+							    BY POST_VIEW DESC
+			                ) A
+			        )
+			 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+
+	<entry key="searchLikePost">
+		SELECT *
+			  FROM (
+			        SELECT ROWNUM RNUM, A.*
+			          FROM (
+			                SELECT 
+							       POST_NO
+							     , MEM_NICK
+							     , POST_NAME
+							     , POST_VIEW
+							     , POST_LIKE
+							     , TO_CHAR(POST_ENROLL, 'YYYY/MM/DD') "POST_ENROLL"
+							     , POST_NOTICE
+							  FROM POST P
+							  JOIN MEMBER ON (POST_WRITER = MEM_NO)
+							 WHERE P.POST_STATUS = 'Y'
+							   AND UPPER(POST_NAME) 
+		 					  LIKE UPPER('%' || ? || '%')
+		    					OR UPPER(POST_CONTENT)
+		  					  LIKE UPPER('%' || ? || '%')
+							 ORDER
+							    BY POST_LIKE DESC
+			                ) A
+			        )
+			 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectReplyList">
+		SELECT
+		       REPLY_NO
+		     , MEM_NICK
+		     , REPLY_CONTENT
+		     , TO_CHAR(REPLY_ENROLL, 'YYYY/MM/DD HH:MI') "REPLY_ENROLL"
+		     , MEM_NO
+		  FROM REPLY
+		  JOIN MEMBER ON (REPLY_WRITER = MEM_NO)
+		 WHERE REPLY_STATUS = 'Y'
+		   AND REF_POST = ?
+		 ORDER
+		    BY REPLY_NO DESC
+	</entry>
+	
+	<entry key="insertReply">
+		INSERT 
+			  INTO REPLY
+			  (
+			    REPLY_NO
+			  , REPLY_WRITER
+			  , REF_POST
+			  , REPLY_CONTENT
+			  )
+			  VALUES
+			  (
+			    SEQ_RNO.NEXTVAL
+			  , ?
+			  , ?
+			  , ?
+			  )
+	</entry>
+	
+	<entry key="deleteReply">
+		UPDATE
+		       REPLY
+		   SET REPLY_STATUS = 'N'
+		 WHERE REPLY_NO = ?
+	</entry>
+	
+	<entry key="statusLike">
+		SELECT 
+			   COUNT(*) COUNT
+	      FROM POST_LIKE
+	     WHERE LIKE_POST = ?
+	       AND LIKE_MEM = ?
+	</entry>
+	
+	<entry key="likeCount">
+		SELECT 
+			   COUNT(*) COUNT
+	      FROM POST_LIKE
+	     WHERE LIKE_POST = ?
+	</entry>
+	
+	<entry key="insertLike">
+		INSERT 
+		  INTO POST_LIKE
+		  (
+		    LIKE_POST
+		  , LIKE_MEM
+		  )
+		  VALUES
+		  (
+		    ?
+		  , ?
+		  )
+	</entry>
+	
+	<entry key="increaseLike">
+		UPDATE
+		       POST
+		   SET POST_LIKE = POST_LIKE+1
+		 WHERE POST_NO = ?
+		   AND POST_STATUS = 'Y'
+	</entry>
+	
+	<entry key="deleteLike">
+		DELETE
+		  FROM POST_LIKE
+		 WHERE LIKE_POST = ?
+		   AND LIKE_MEM = ?
+	</entry>
+	
+	<entry key="decreaseLike">
+		UPDATE
+		       POST
+		   SET POST_LIKE = POST_LIKE-1
+		 WHERE POST_NO = ?
+		   AND POST_STATUS = 'Y'
+	</entry>
+	
+	<entry key="blockMember">
+		UPDATE 
+			   MEMBER
+   		   SET MEM_ACCESS = 'BLOCK'
+   		     , BLOCK_DATE = SYSDATE
+         WHERE MEM_NICK = ?
+	</entry>
+	
+	
+	
+	
+	
+	
+	
+
+
+
+</properties>

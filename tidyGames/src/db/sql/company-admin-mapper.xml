@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<entry key="insertCompany">
+		INSERT
+		  INTO COMPANY
+		  (
+		    COMPANY_NO
+		  , COMPANY_NAME
+		  , COMPANY_PWD
+		  , COMPANY_HEAD
+		  , COMPANY_COMMENT
+		  , COMPANY_ID
+		  )
+		  VALUES
+		  (
+		    SEQ_CNO.NEXTVAL
+		  , ?
+		  , DBMS_RANDOM.STRING('A',7)
+		  , ?
+		  , ?
+		  , ?
+		  )
+	</entry>
+
+	<entry key="selectListCount">
+		SELECT
+		       COUNT(*) COUNT
+		  FROM COMPANY
+		 WHERE COMPANY_STATUS = 'Y'
+	</entry>	
+
+	<entry key="selectCompanyList">
+		SELECT *
+		  FROM (
+		        SELECT ROWNUM RNUM, A.*
+		          FROM (
+		                SELECT 
+						       COMPANY_NO
+						     , COMPANY_NAME
+						     , COMPANY_ID
+						     , COMPANY_PWD
+						     , COMPANY_ENROLL
+						  FROM COMPANY
+						 WHERE COMPANY_STATUS = 'Y'
+						 ORDER
+						    BY COMPANY_NO DESC
+		                ) A
+		        )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+
+	<entry key="searchCompany">
+		SELECT 
+		       COMPANY_NO
+		     , COMPANY_NAME
+		     , COMPANY_ID
+		     , COMPANY_PWD
+		     , COMPANY_ENROLL
+		  FROM COMPANY
+		 WHERE COMPANY_STATUS = 'Y'
+		   AND UPPER(COMPANY_NAME) LIKE UPPER('%' || ? || '%')
+		 ORDER
+		    BY COMPANY_NO DESC
+	</entry>
+
+	<entry key="selectCompanyDetail">
+		SELECT
+		       COMPANY_NO
+		     , COMPANY_NAME
+		     , COMPANY_ID
+		     , COMPANY_PWD
+		     , COMPANY_HEAD
+		     , COMPANY_COMMENT
+		  FROM COMPANY
+		 WHERE COMPANY_NO = ?
+	</entry>
+
+	<entry key="updateCompany">
+		UPDATE
+		       COMPANY
+		   SET COMPANY_NAME = ?
+		     , COMPANY_ID = ?
+		     , COMPANY_HEAD = ?
+		     , COMPANY_COMMENT = ?
+		 WHERE COMPANY_NO = ?
+	</entry>
+
+	<entry key="deleteCompany">
+		UPDATE
+		       COMPANY
+		   SET COMPANY_STATUS = 'N'
+		 WHERE COMPANY_NO = ?
+	</entry>
+
+
+	<entry key="selectGameList">
+		SELECT
+		       GAME_NO
+		     , KOR_NAME
+		     , ENG_NAME
+		     , TO_CHAR(RELEASE_DATE, 'YY/MM/DD') "RELEASE_DATE"
+		     , TO_CHAR(UPLOAD_DATE, 'YY/MM/DD') "UPLOAD_DATE"
+		  FROM GAME
+		 WHERE GAME_STATUS = 'Y'
+		   AND COMPANY_NO = ?
+		 ORDER
+		    BY GAME_NO DESC
+	</entry>
+
+
+</properties>
